@@ -8,6 +8,8 @@
 \usepackage{xcolor}
 \usepackage{hyperref}
 \usepackage{listings}
+\usepackage{tikz}
+\usetikzlibrary{shapes.geometric, arrows.meta, positioning, shadows, calc}
 
 \definecolor{senacblue}{RGB}{0,65,130}
 \definecolor{codebg}{RGB}{248,248,248}
@@ -50,10 +52,23 @@
 }
 \lstset{style=aula}
 
+% TikZ styles
+\tikzset{
+  block/.style={rectangle, rounded corners, draw=senacblue, fill=senacblue!10, thick, minimum width=2.5cm, minimum height=1cm, align=center, font=\small},
+  process/.style={rectangle, draw=senacblue, fill=senacblue!20, thick, minimum width=2cm, minimum height=0.8cm, align=center, font=\footnotesize},
+  decision/.style={diamond, draw=senacblue, fill=orange!20, thick, aspect=2, align=center, font=\footnotesize},
+  arrow/.style={-{Latex[length=3mm]}, thick, color=senacblue},
+  bigarrow/.style={-{Latex[length=4mm]}, very thick, color=senacblue!80},
+  dashedarrow/.style={-{Latex[length=3mm]}, thick, dashed, color=gray},
+  client/.style={rectangle, rounded corners, draw=green!60!black, fill=green!10, thick, minimum width=2cm, minimum height=1cm, align=center, font=\small},
+  server/.style={rectangle, rounded corners, draw=blue!60!black, fill=blue!10, thick, minimum width=2cm, minimum height=1cm, align=center, font=\small},
+  queue/.style={rectangle, draw=orange!80!black, fill=orange!15, thick, minimum width=2.2cm, minimum height=0.7cm, align=center, font=\scriptsize}
+}
+
 \title[Fullstack -- AULA 1]{Desenvolvimento Fullstack: Backend com Node.js}
 \subtitle{Aula 1 (4h) -- Introdu\c{c}\~ao ao Node.js e ao backend}
-\author[Valtemir Proc\'opio]{Valtemir Proc\'opio de Lima\\Senac}
-\date[2026]{2026}
+\author[Valtemir Proc\'opio]{Valtemir Proc\'opio de Lima\\Senac Rio Grande do Norte}
+\date[2026]{Mar\c{c}o de 2026}
 
 \setbeamertemplate{title page}{
   \begin{centering}
@@ -130,14 +145,39 @@ Nunca confie em valida\c{c}\~oes feitas apenas no frontend. O backend \'{e} a \'
 \end{alertblock}
 \end{frame}
 
+\begin{frame}{Arquitetura Cliente-Servidor (vis\~ao visual)}
+\begin{center}
+\begin{tikzpicture}[node distance=1.5cm]
+  \node[client] (browser) {\textbf{Navegador}\\(Cliente)};
+  \node[server, right=4cm of browser] (server) {\textbf{Servidor}\\(Backend)};
+  \node[process, below=0.8cm of server] (db) {Banco de Dados};
+  
+  \draw[bigarrow, bend left=15] (browser.north east) to node[above, font=\tiny] {Requisi\c{c}\~ao HTTP} (server.north west);
+  \draw[bigarrow, bend left=15] (server.south west) to node[below, font=\tiny] {Resposta (JSON/HTML)} (browser.south east);
+  \draw[arrow] (server) -- (db);
+  
+  \node[font=\scriptsize, text width=2cm, align=center] at ($(browser)+(0,-2)$) {HTML, CSS,\\JavaScript};
+  \node[font=\scriptsize, text width=2.5cm, align=center] at ($(server)+(0,-2)$) {Node.js, Python,\\Java, Go...};
+\end{tikzpicture}
+\end{center}
+\end{frame}
+
 \begin{frame}{O fluxo de uma requisi\c{c}\~ao web}
-\begin{enumerate}
-  \item Usu\'ario interage com a interface (clique, formul\'ario).
-  \item Navegador envia uma \textbf{requisi\c{c}\~ao HTTP} ao servidor.
-  \item Servidor executa l\'ogica de neg\'ocio (autentica, consulta banco).
-  \item Servidor retorna uma \textbf{resposta} (JSON, HTML, arquivo).
-  \item Frontend renderiza o resultado ao usu\'ario.
-\end{enumerate}
+\begin{center}
+\begin{tikzpicture}[node distance=1.2cm]
+  \node[process] (step1) {1. Usu\'ario interage};
+  \node[process, below=of step1] (step2) {2. Navegador envia HTTP};
+  \node[process, below=of step2] (step3) {3. Servidor processa};
+  \node[process, below=of step3] (step4) {4. Servidor responde};
+  \node[process, below=of step4] (step5) {5. Frontend renderiza};
+  
+  \draw[arrow] (step1) -- (step2);
+  \draw[arrow] (step2) -- (step3);
+  \draw[arrow] (step3) -- (step4);
+  \draw[arrow] (step4) -- (step5);
+\end{tikzpicture}
+\end{center}
+\vspace{0.5em}
 \begin{block}{Protocolo central}
 HTTP (HyperText Transfer Protocol) define os verbos, c\'odigos de status e headers que governam toda troca de dados na web.
 \end{block}
@@ -197,6 +237,27 @@ Node.js \'{e} um \textbf{runtime} de JavaScript constru\'ido sobre o motor V8 do
 \end{columns}
 \end{frame}
 
+\begin{frame}{Event Loop: o cora\c{c}\~ao do Node.js (simplificado)}
+\begin{center}
+\begin{tikzpicture}[node distance=1.3cm and 1.5cm]
+  \node[block] (callstack) {\textbf{Call Stack}\\Thread Principal};
+  \node[queue, below left=of callstack] (cbqueue) {Callback Queue};
+  \node[queue, below right=of callstack] (io) {I/O (File, Net)};
+  \node[process, below=1.8cm of callstack] (eventloop) {\textbf{Event Loop}};
+  
+  \draw[arrow] (callstack.south west) -- node[left, font=\tiny] {delega I/O} (io.north);
+  \draw[arrow] (io.west) -- node[below, font=\tiny] {callback pronto} (cbqueue.east);
+  \draw[arrow] (cbqueue.north) -- node[left, font=\tiny] {empurra} (callstack.south);
+  \draw[arrow, dashed] (eventloop) -- (cbqueue);
+  \draw[arrow, dashed] (eventloop) -- (io);
+\end{tikzpicture}
+\end{center}
+\vspace{0.3em}
+\begin{alertblock}{Conceito-chave}
+A thread principal nunca bloqueia. Opera\c{c}\~oes lentas s\~ao delegadas e processadas via callback quando prontas.
+\end{alertblock}
+\end{frame}
+
 \begin{frame}{Event Loop: o cora\c{c}\~ao do Node.js}
 \begin{block}{Como funciona}
 O Node.js possui uma \'{u}nica thread principal. Opera\c{c}\~oes lentas (I/O) s\~ao delegadas a threads auxiliares e o resultado \'{e} retornado via \textbf{callback} quando pronto.
@@ -222,22 +283,20 @@ O NVM (Node Version Manager) permite instalar e alternar entre m\'ultiplas vers\
 \column{0.48\textwidth}
 \begin{block}{Linux / macOS}
 \begin{lstlisting}
-# instalar nvm
 curl -o- https://raw.githubusercontent.com/
 nvm-sh/nvm/v0.39.7/install.sh | bash
 
-# instalar Node LTS
 nvm install --lts
 nvm use --lts
-node -v   # ex: v22.x.x
+node -v
 npm  -v
 \end{lstlisting}
 \end{block}
 \column{0.48\textwidth}
 \begin{block}{Windows}
 \begin{lstlisting}
-# usar nvm-windows:
-# github.com/coreybutler/nvm-windows
+%% usar nvm-windows:
+%% github.com/coreybutler/nvm-windows
 nvm install lts
 nvm use lts
 node -v
@@ -358,6 +417,38 @@ npm run dev
 \section{Sincrono vs. Ass\'incrono: o modelo Node.js}
 % ============================================================
 
+\begin{frame}{C\'odigo S\'incrono vs. Ass\'incrono (compara\c{c}\~ao visual)}
+\begin{columns}[T]
+\column{0.48\textwidth}
+\begin{center}
+\textbf{S\'incrono (bloqueante)}
+\vspace{0.3cm}
+\begin{tikzpicture}[node distance=0.6cm]
+  \node[process, fill=red!20] (t1) {Tarefa 1};
+  \node[process, fill=red!20, below=of t1] (t2) {Tarefa 2};
+  \node[process, fill=red!20, below=of t2] (t3) {Tarefa 3};
+  \draw[arrow] (t1) -- (t2);
+  \draw[arrow] (t2) -- (t3);
+  \node[font=\tiny, right=0.3cm of t1] {espera};
+  \node[font=\tiny, right=0.3cm of t2] {espera};
+\end{tikzpicture}
+\end{center}
+\column{0.48\textwidth}
+\begin{center}
+\textbf{Ass\'incrono (n\~ao-bloqueante)}
+\vspace{0.3cm}
+\begin{tikzpicture}[node distance=0.6cm]
+  \node[process, fill=green!20] (t1) {Inicia T1};
+  \node[process, fill=green!20, below=of t1] (t2) {Inicia T2};
+  \node[process, fill=green!20, below=of t2] (t3) {Inicia T3};
+  \draw[dashedarrow] (t1.east) -- ++(1.2,0) node[right, font=\tiny] {callback};
+  \draw[dashedarrow] (t2.east) -- ++(1.2,0) node[right, font=\tiny] {callback};
+  \draw[dashedarrow] (t3.east) -- ++(1.2,0) node[right, font=\tiny] {callback};
+\end{tikzpicture}
+\end{center}
+\end{columns}
+\end{frame}
+
 \begin{frame}[fragile]{Callback, Promise e Async/Await}
 \begin{columns}[T]
 \column{0.48\textwidth}
@@ -420,15 +511,15 @@ Em projetos novos, \textbf{sempre use async/await}. Callbacks ficam restritos a 
 \begin{lstlisting}
 meu-backend/
 |-- src/
-|   |-- routes/       % definicao das rotas
-|   |-- controllers/  % logica de cada rota
-|   |-- middlewares/  % autenticacao, logs, erros
-|   |-- models/       % modelos de dados (BD)
-|   `-- app.js        % configuracao do Express
-|-- .env              % variaveis de ambiente
+|   |-- routes/       %% definicao das rotas
+|   |-- controllers/  %% logica de cada rota
+|   |-- middlewares/  %% autenticacao, logs, erros
+|   |-- models/       %% modelos de dados (BD)
+|   `-- app.js        %% configuracao do Express
+|-- .env              %% variaveis de ambiente
 |-- .gitignore
 |-- package.json
-`-- server.js         % ponto de entrada (listen)
+`-- server.js         %% ponto de entrada (listen)
 \end{lstlisting}
 \end{block}
 \begin{itemize}
