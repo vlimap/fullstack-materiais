@@ -214,14 +214,14 @@ O Node.js possui uma \'{u}nica thread principal. Opera\c{c}\~oes lentas (I/O) s\
 \section{Instala\c{c}\~ao e configura\c{c}\~ao do ambiente}
 % ============================================================
 
-\begin{frame}{Instalando o Node.js (via NVM -- recomendado)}
+\begin{frame}[fragile]{Instalando o Node.js (via NVM -- recomendado)}
 \begin{block}{Por que usar NVM?}
 O NVM (Node Version Manager) permite instalar e alternar entre m\'ultiplas vers\~oes do Node sem conflitos.
 \end{block}
 \begin{columns}[T]
 \column{0.48\textwidth}
 \begin{block}{Linux / macOS}
-\begin{lstlisting}[language=bash]
+\begin{lstlisting}
 # instalar nvm
 curl -o- https://raw.githubusercontent.com/
 nvm-sh/nvm/v0.39.7/install.sh | bash
@@ -235,9 +235,9 @@ npm  -v
 \end{block}
 \column{0.48\textwidth}
 \begin{block}{Windows}
-\begin{lstlisting}[language=bash]
+\begin{lstlisting}
 # usar nvm-windows:
-# https://github.com/coreybutler/nvm-windows
+# github.com/coreybutler/nvm-windows
 nvm install lts
 nvm use lts
 node -v
@@ -255,7 +255,7 @@ npm  -v
   \item Extens\~ao \textbf{GitLens} -- hist\'orico e blame integrado.
 \end{itemize}
 \begin{block}{settings.json recomendado}
-\begin{lstlisting}[language={}]
+\begin{lstlisting}
 {
   "editor.formatOnSave": true,
   "editor.defaultFormatter": "esbenp.prettier-vscode",
@@ -280,10 +280,10 @@ console.log(`Bem-vindo, ${nome}!`);
 \end{lstlisting}
 \end{block}
 \begin{block}{Executar no terminal}
-\begin{lstlisting}[language=bash]
+\begin{lstlisting}
 node hello.js
-# Hello, Node.js!
-# Bem-vindo, Valtemir!
+// Hello, Node.js!
+// Bem-vindo, Valtemir!
 \end{lstlisting}
 \end{block}
 \end{frame}
@@ -333,21 +333,16 @@ server.listen(3000, () => {
 
 \begin{frame}[fragile]{Iniciando um projeto com npm}
 \begin{block}{Comandos b\'asicos}
-\begin{lstlisting}[language=bash]
-# Criar pasta e inicializar projeto
-mkdir meu-backend && cd meu-backend
-npm init -y          # gera package.json com defaults
-
-# Instalar dependencia de desenvolvimento
+\begin{lstlisting}
+mkdir meu-backend
+cd meu-backend
+npm init -y
 npm install nodemon --save-dev
-
-# Script no package.json
-# "dev": "nodemon server.js"
-npm run dev          # reinicia automaticamente ao salvar
+npm run dev
 \end{lstlisting}
 \end{block}
 \begin{block}{package.json gerado (trecho)}
-\begin{lstlisting}[language={}]
+\begin{lstlisting}[language=JavaScript]
 {
   "name": "meu-backend",
   "scripts": {
@@ -422,18 +417,18 @@ Em projetos novos, \textbf{sempre use async/await}. Callbacks ficam restritos a 
 
 \begin{frame}[fragile]{Estrutura de pastas recomendada}
 \begin{block}{Organiza\c{c}\~ao m\'inima para um projeto Express}
-\begin{lstlisting}[language={}]
+\begin{lstlisting}
 meu-backend/
 |-- src/
-|   |-- routes/       # definicao das rotas
-|   |-- controllers/  # logica de cada rota
-|   |-- middlewares/  # autenticacao, logs, erros
-|   |-- models/       # modelos de dados (BD)
-|   `-- app.js        # configuracao do Express
-|-- .env              # variaveis de ambiente
+|   |-- routes/       % definicao das rotas
+|   |-- controllers/  % logica de cada rota
+|   |-- middlewares/  % autenticacao, logs, erros
+|   |-- models/       % modelos de dados (BD)
+|   `-- app.js        % configuracao do Express
+|-- .env              % variaveis de ambiente
 |-- .gitignore
 |-- package.json
-`-- server.js         # ponto de entrada (listen)
+`-- server.js         % ponto de entrada (listen)
 \end{lstlisting}
 \end{block}
 \begin{itemize}
@@ -444,7 +439,7 @@ meu-backend/
 
 \begin{frame}[fragile]{Arquivo \code{.gitignore} essencial para Node.js}
 \begin{block}{\code{.gitignore}}
-\begin{lstlisting}[language={}]
+\begin{lstlisting}
 node_modules/
 .env
 dist/
@@ -488,7 +483,8 @@ const server = http.createServer((req, res) => {
   if (req.url === '/' && req.method === 'GET') {
     res.writeHead(200);
     res.end(JSON.stringify({ mensagem: 'API online' }));
-  } else if (req.url === '/usuarios' && req.method === 'GET') {
+  } else if (req.url === '/usuarios'
+             && req.method === 'GET') {
     res.writeHead(200);
     res.end(JSON.stringify([
       { id: 1, nome: 'Ana' },
@@ -517,7 +513,7 @@ server.listen(3000, () =>
 \end{enumerate}
 \end{frame}
 
-\begin{frame}{Entregável da Aula 1}
+\begin{frame}{Entreg\'avel da Aula 1}
 \begin{block}{Reposit\'orio GitHub com}
 \begin{itemize}
   \item \code{package.json} configurado com scripts \code{start} e \code{dev}.
@@ -538,7 +534,7 @@ Hoje voc\^e entendeu o papel do backend, instalou o Node.js, compreendeu o Event
 \end{block}
 \begin{itemize}
   \item \textbf{Pr\'oxima aula}: Express -- estrutura, rotas e servidor b\'asico.
-  \item \textbf{Tarefa}: publicar o reposit\'orio com o entregável descrito acima.
+  \item \textbf{Tarefa}: publicar o reposit\'orio com o entreg\'avel descrito acima.
 \end{itemize}
 \end{frame}
 
@@ -568,7 +564,7 @@ Hoje voc\^e entendeu o papel do backend, instalou o Node.js, compreendeu o Event
   \url{https://github.com/coreybutler/nvm-windows}
 
   \item OpenJS Foundation -- Node.js release schedule\\
-  \url{https://github.com/nodejs/release#release-schedule}
+  \url{https://github.com/nodejs/release}
 
   \item CGI.br -- Cartilha de Seguran\c{c}a para Internet\\
   \url{https://www.cgi.br/publicacao/cartilha-de-seguranca-para-internet/}
