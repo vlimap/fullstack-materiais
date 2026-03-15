@@ -1,0 +1,578 @@
+\documentclass[aspectratio=169]{beamer}
+
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[brazil]{babel}
+\usepackage{lmodern}
+\usepackage{graphicx}
+\usepackage{xcolor}
+\usepackage{hyperref}
+\usepackage{listings}
+
+\definecolor{senacblue}{RGB}{0,65,130}
+\definecolor{codebg}{RGB}{248,248,248}
+\definecolor{codeframe}{RGB}{220,220,220}
+\definecolor{codestr}{RGB}{0,128,0}
+\definecolor{codekw}{RGB}{0,65,130}
+\definecolor{codecom}{RGB}{120,120,120}
+
+\hypersetup{colorlinks=true, urlcolor=senacblue, linkcolor=senacblue}
+\pdfstringdefDisableCommands{\def\\{ }}
+\newcommand{\code}[1]{\texttt{#1}}
+
+\usetheme{Madrid}
+\usecolortheme{dolphin}
+\setbeamercolor{structure}{fg=senacblue}
+\setbeamercolor{frametitle}{bg=senacblue!5, fg=senacblue}
+\setbeamercolor{title}{fg=senacblue}
+\setbeamercolor{block title}{bg=senacblue!10, fg=senacblue}
+\setbeamercolor{block body}{bg=white}
+\setbeamertemplate{navigation symbols}{}
+
+\lstdefinestyle{aula}{
+  backgroundcolor=\color{codebg},
+  frame=single,
+  rulecolor=\color{codeframe},
+  basicstyle=\ttfamily\tiny,
+  keywordstyle=\bfseries\color{codekw},
+  commentstyle=\itshape\color{codecom},
+  stringstyle=\color{codestr},
+  showstringspaces=false,
+  tabsize=2,
+  columns=fullflexible,
+  breaklines=true,
+  breakatwhitespace=true,
+  keepspaces=true,
+  upquote=true,
+  xleftmargin=0.8em,
+  framexleftmargin=0.6em,
+  framexrightmargin=0.4em
+}
+\lstset{style=aula}
+
+\title[Fullstack -- AULA 1]{Desenvolvimento Fullstack: Backend com Node.js}
+\subtitle{Aula 1 (4h) -- Introdu\c{c}\~ao ao Node.js e ao backend}
+\author[Valtemir Proc\'opio]{Valtemir Proc\'opio de Lima\\Senac}
+\date[2026]{2026}
+
+\setbeamertemplate{title page}{
+  \begin{centering}
+    \vspace*{0.6cm}
+    \IfFileExists{senac_logo.png}{\includegraphics[height=2.0cm]{senac_logo.png}\par}{}
+    \vspace{0.8cm}
+    {\usebeamerfont{title}\usebeamercolor[fg]{title}\LARGE\bfseries\inserttitle\par}
+    \vspace{0.4cm}
+    {\usebeamerfont{subtitle}\large\insertsubtitle\par}
+    \vspace{1.0cm}
+    {\usebeamerfont{author}\large\insertauthor\par}
+    \vspace{0.2cm}
+    {\usebeamerfont{date}\normalsize\insertdate\par}
+    \vfill
+  \end{centering}
+}
+
+\setbeamercolor{author in head/foot}{bg=senacblue, fg=white}
+\setbeamercolor{title in head/foot}{bg=senacblue!90, fg=white}
+\setbeamercolor{date in head/foot}{bg=senacblue, fg=white}
+
+\setbeamertemplate{footline}{%
+  \leavevmode%
+  \hbox{%
+    \begin{beamercolorbox}[wd=.30\paperwidth,ht=2.6ex,dp=1ex,left]{author in head/foot}%
+      \hspace*{0.8em}{\color{white}\textbf{\insertshortauthor}}
+    \end{beamercolorbox}%
+    \begin{beamercolorbox}[wd=.50\paperwidth,ht=2.6ex,dp=1ex,center]{title in head/foot}%
+      {\color{white}\textbf{Fullstack -- AULA 1}}
+    \end{beamercolorbox}%
+    \begin{beamercolorbox}[wd=.20\paperwidth,ht=2.6ex,dp=1ex,right]{date in head/foot}%
+      \insertframenumber/\inserttotalframenumber\hspace*{0.8em}
+    \end{beamercolorbox}%
+  }%
+  \vskip0pt%
+}
+
+\begin{document}
+
+\begin{frame}[plain]
+  \titlepage
+\end{frame}
+
+\begin{frame}{Roteiro da Aula}
+\tableofcontents
+\end{frame}
+
+% ============================================================
+\section{O que \'{e} o backend e por que ele existe}
+% ============================================================
+
+\begin{frame}{Frontend vs. Backend: a divis\~ao do trabalho}
+\begin{columns}[T]
+\column{0.48\textwidth}
+\begin{block}{Frontend}
+\begin{itemize}
+  \item Interface visual renderizada no navegador.
+  \item HTML, CSS, JavaScript no cliente.
+  \item Respons\'avel pela experi\^encia do usu\'ario.
+\end{itemize}
+\end{block}
+\column{0.48\textwidth}
+\begin{block}{Backend}
+\begin{itemize}
+  \item L\'ogica de neg\'ocio, dados e seguran\c{c}a.
+  \item Executa no servidor, invis\'ivel ao usu\'ario.
+  \item Exposto ao frontend via \textbf{API}.
+\end{itemize}
+\end{block}
+\end{columns}
+\vspace{0.4em}
+\begin{alertblock}{Regra pr\'atica}
+Nunca confie em valida\c{c}\~oes feitas apenas no frontend. O backend \'{e} a \'{u}ltima barreira de seguran\c{c}a.
+\end{alertblock}
+\end{frame}
+
+\begin{frame}{O fluxo de uma requisi\c{c}\~ao web}
+\begin{enumerate}
+  \item Usu\'ario interage com a interface (clique, formul\'ario).
+  \item Navegador envia uma \textbf{requisi\c{c}\~ao HTTP} ao servidor.
+  \item Servidor executa l\'ogica de neg\'ocio (autentica, consulta banco).
+  \item Servidor retorna uma \textbf{resposta} (JSON, HTML, arquivo).
+  \item Frontend renderiza o resultado ao usu\'ario.
+\end{enumerate}
+\begin{block}{Protocolo central}
+HTTP (HyperText Transfer Protocol) define os verbos, c\'odigos de status e headers que governam toda troca de dados na web.
+\end{block}
+\end{frame}
+
+\begin{frame}{Verbos HTTP essenciais}
+\begin{center}
+\begin{tabular}{|c|l|l|}
+\hline
+\textbf{Verbo} & \textbf{A\c{c}\~ao} & \textbf{Exemplo} \\
+\hline
+GET    & Buscar/listar recurso   & Listar usu\'arios    \\
+POST   & Criar recurso           & Cadastrar usu\'ario  \\
+PUT    & Substituir recurso      & Atualizar perfil    \\
+PATCH  & Atualizar parcialmente  & Mudar senha         \\
+DELETE & Remover recurso         & Excluir conta       \\
+\hline
+\end{tabular}
+\end{center}
+\end{frame}
+
+% ============================================================
+\section{Node.js: conceitos fundamentais}
+% ============================================================
+
+\begin{frame}{O que \'{e} o Node.js?}
+\begin{block}{Defini\c{c}\~ao}
+Node.js \'{e} um \textbf{runtime} de JavaScript constru\'ido sobre o motor V8 do Chrome, que permite executar JavaScript fora do navegador -- diretamente no servidor.
+\end{block}
+\begin{itemize}
+  \item Criado por Ryan Dahl em 2009.
+  \item Baseado em \textbf{I/O n\~ao-bloqueante} e \textbf{event loop}.
+  \item Ideal para APIs, microsservi\c{c}os e aplica\c{c}\~oes em tempo real.
+  \item Gerenciado pela OpenJS Foundation; vers\~ao LTS recomendada para produ\c{c}\~ao.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Por que Node.js para backend?}
+\begin{columns}[T]
+\column{0.48\textwidth}
+\begin{block}{Vantagens}
+\begin{itemize}
+  \item Mesma linguagem no front e no back.
+  \item Alta performance em opera\c{c}\~oes I/O (rede, disco).
+  \item Ecossistema gigante via \textbf{npm}.
+  \item Comunidade ativa e mercado consolidado.
+\end{itemize}
+\end{block}
+\column{0.48\textwidth}
+\begin{block}{Limita\c{c}\~oes a conhecer}
+\begin{itemize}
+  \item N\~ao \'{e} ideal para processamento CPU-intensivo.
+  \item Callback hell (mitigado com async/await).
+  \item Erros n\~ao tratados derrubam o processo.
+\end{itemize}
+\end{block}
+\end{columns}
+\end{frame}
+
+\begin{frame}{Event Loop: o cora\c{c}\~ao do Node.js}
+\begin{block}{Como funciona}
+O Node.js possui uma \'{u}nica thread principal. Opera\c{c}\~oes lentas (I/O) s\~ao delegadas a threads auxiliares e o resultado \'{e} retornado via \textbf{callback} quando pronto.
+\end{block}
+\begin{enumerate}
+  \item Requisi\c{c}\~ao entra na \textbf{Call Stack}.
+  \item I/O (ex.: leitura de arquivo) \'{e} delegado ao sistema.
+  \item A thread principal continua processando outras requisi\c{c}\~oes.
+  \item Quando o I/O termina, o callback entra na \textbf{Callback Queue}.
+  \item O Event Loop empurra o callback de volta \`a Call Stack.
+\end{enumerate}
+\end{frame}
+
+% ============================================================
+\section{Instala\c{c}\~ao e configura\c{c}\~ao do ambiente}
+% ============================================================
+
+\begin{frame}{Instalando o Node.js (via NVM -- recomendado)}
+\begin{block}{Por que usar NVM?}
+O NVM (Node Version Manager) permite instalar e alternar entre m\'ultiplas vers\~oes do Node sem conflitos.
+\end{block}
+\begin{columns}[T]
+\column{0.48\textwidth}
+\begin{block}{Linux / macOS}
+\begin{lstlisting}[language=bash]
+# instalar nvm
+curl -o- https://raw.githubusercontent.com/
+nvm-sh/nvm/v0.39.7/install.sh | bash
+
+# instalar Node LTS
+nvm install --lts
+nvm use --lts
+node -v   # ex: v22.x.x
+npm  -v
+\end{lstlisting}
+\end{block}
+\column{0.48\textwidth}
+\begin{block}{Windows}
+\begin{lstlisting}[language=bash]
+# usar nvm-windows:
+# https://github.com/coreybutler/nvm-windows
+nvm install lts
+nvm use lts
+node -v
+npm  -v
+\end{lstlisting}
+\end{block}
+\end{columns}
+\end{frame}
+
+\begin{frame}[fragile]{Configurando o VS Code para Node.js}
+\begin{itemize}
+  \item Extens\~ao \textbf{ESLint} -- verifica erros e padr\~oes de c\'odigo em tempo real.
+  \item Extens\~ao \textbf{Prettier} -- formata\c{c}\~ao autom\'atica ao salvar.
+  \item Extens\~ao \textbf{REST Client} ou \textbf{Thunder Client} -- testa APIs direto no editor.
+  \item Extens\~ao \textbf{GitLens} -- hist\'orico e blame integrado.
+\end{itemize}
+\begin{block}{settings.json recomendado}
+\begin{lstlisting}[language={}]
+{
+  "editor.formatOnSave": true,
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "editor.tabSize": 2
+}
+\end{lstlisting}
+\end{block}
+\end{frame}
+
+% ============================================================
+\section{Primeiros scripts Node.js}
+% ============================================================
+
+\begin{frame}[fragile]{Hello World no Node.js}
+\begin{block}{Arquivo: \code{hello.js}}
+\begin{lstlisting}[language=JavaScript]
+// Primeiro script Node.js
+console.log('Hello, Node.js!');
+
+const nome = 'Valtemir';
+console.log(`Bem-vindo, ${nome}!`);
+\end{lstlisting}
+\end{block}
+\begin{block}{Executar no terminal}
+\begin{lstlisting}[language=bash]
+node hello.js
+# Hello, Node.js!
+# Bem-vindo, Valtemir!
+\end{lstlisting}
+\end{block}
+\end{frame}
+
+\begin{frame}[fragile]{M\'odulos nativos: \code{fs} e \code{path}}
+\begin{block}{Lendo um arquivo de texto (\code{fs.readFile})}
+\begin{lstlisting}[language=JavaScript]
+const fs   = require('fs');
+const path = require('path');
+
+const arquivo = path.join(__dirname, 'dados.txt');
+
+fs.readFile(arquivo, 'utf8', (err, conteudo) => {
+  if (err) {
+    console.error('Erro ao ler arquivo:', err.message);
+    return;
+  }
+  console.log('Conteudo:', conteudo);
+});
+\end{lstlisting}
+\end{block}
+\begin{alertblock}{Aten\c{c}\~ao}
+O callback \'{e} chamado \textbf{assincronamente} -- o c\'odigo ap\'os \code{readFile} executa antes do arquivo terminar de ser lido.
+\end{alertblock}
+\end{frame}
+
+\begin{frame}[fragile]{Servidor HTTP nativo (sem framework)}
+\begin{block}{Arquivo: \code{server.js}}
+\begin{lstlisting}[language=JavaScript]
+const http = require('http');
+
+const server = http.createServer((req, res) => {
+  res.writeHead(200, { 'Content-Type': 'text/plain; charset=utf-8' });
+  res.end('Servidor Node.js funcionando!');
+});
+
+server.listen(3000, () => {
+  console.log('Servidor ouvindo em http://localhost:3000');
+});
+\end{lstlisting}
+\end{block}
+\begin{itemize}
+  \item Acesse \url{http://localhost:3000} no navegador para testar.
+  \item Use \code{Ctrl+C} para encerrar o servidor.
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Iniciando um projeto com npm}
+\begin{block}{Comandos b\'asicos}
+\begin{lstlisting}[language=bash]
+# Criar pasta e inicializar projeto
+mkdir meu-backend && cd meu-backend
+npm init -y          # gera package.json com defaults
+
+# Instalar dependencia de desenvolvimento
+npm install nodemon --save-dev
+
+# Script no package.json
+# "dev": "nodemon server.js"
+npm run dev          # reinicia automaticamente ao salvar
+\end{lstlisting}
+\end{block}
+\begin{block}{package.json gerado (trecho)}
+\begin{lstlisting}[language={}]
+{
+  "name": "meu-backend",
+  "scripts": {
+    "start": "node server.js",
+    "dev":   "nodemon server.js"
+  }
+}
+\end{lstlisting}
+\end{block}
+\end{frame}
+
+% ============================================================
+\section{Sincrono vs. Ass\'incrono: o modelo Node.js}
+% ============================================================
+
+\begin{frame}[fragile]{Callback, Promise e Async/Await}
+\begin{columns}[T]
+\column{0.48\textwidth}
+\begin{block}{Callback (estilo antigo)}
+\begin{lstlisting}[language=JavaScript]
+fs.readFile('a.txt', 'utf8',
+  (err, data) => {
+    if (err) throw err;
+    console.log(data);
+  }
+);
+\end{lstlisting}
+\end{block}
+\begin{block}{Promise}
+\begin{lstlisting}[language=JavaScript]
+fs.promises
+  .readFile('a.txt', 'utf8')
+  .then(data => console.log(data))
+  .catch(err => console.error(err));
+\end{lstlisting}
+\end{block}
+\column{0.48\textwidth}
+\begin{block}{Async/Await (recomendado)}
+\begin{lstlisting}[language=JavaScript]
+async function lerArquivo() {
+  try {
+    const data = await
+      fs.promises.readFile(
+        'a.txt', 'utf8'
+      );
+    console.log(data);
+  } catch (err) {
+    console.error(err);
+  }
+}
+lerArquivo();
+\end{lstlisting}
+\end{block}
+\end{columns}
+\end{frame}
+
+\begin{frame}{Por que async/await \'{e} o padr\~ao moderno?}
+\begin{itemize}
+  \item C\'odigo linear, f\'acil de ler e depurar.
+  \item Tratamento de erros com \code{try/catch} familiar.
+  \item Funciona em qualquer fun\c{c}\~ao marcada com \code{async}.
+  \item Compat\'ivel com todas as APIs que retornam Promise.
+\end{itemize}
+\begin{alertblock}{Regra de ouro}
+Em projetos novos, \textbf{sempre use async/await}. Callbacks ficam restritos a bibliotecas legadas.
+\end{alertblock}
+\end{frame}
+
+% ============================================================
+\section{Estrutura inicial de um projeto backend}
+% ============================================================
+
+\begin{frame}[fragile]{Estrutura de pastas recomendada}
+\begin{block}{Organiza\c{c}\~ao m\'inima para um projeto Express}
+\begin{lstlisting}[language={}]
+meu-backend/
+|-- src/
+|   |-- routes/       # definicao das rotas
+|   |-- controllers/  # logica de cada rota
+|   |-- middlewares/  # autenticacao, logs, erros
+|   |-- models/       # modelos de dados (BD)
+|   `-- app.js        # configuracao do Express
+|-- .env              # variaveis de ambiente
+|-- .gitignore
+|-- package.json
+`-- server.js         # ponto de entrada (listen)
+\end{lstlisting}
+\end{block}
+\begin{itemize}
+  \item Separar \code{app.js} de \code{server.js} facilita testes automatizados.
+  \item \code{.env} nunca deve ser versionado -- adicionar ao \code{.gitignore}.
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Arquivo \code{.gitignore} essencial para Node.js}
+\begin{block}{\code{.gitignore}}
+\begin{lstlisting}[language={}]
+node_modules/
+.env
+dist/
+*.log
+.DS_Store
+coverage/
+\end{lstlisting}
+\end{block}
+\begin{alertblock}{Aten\c{c}\~ao cr\'itica}
+Jam\'ais versione \code{node\_modules} ou \code{.env}. O \code{node\_modules} tem milhares de arquivos e o \code{.env} pode conter senhas e tokens.
+\end{alertblock}
+\end{frame}
+
+% ============================================================
+\section{Atividade pr\'atica da aula (4h)}
+% ============================================================
+
+\begin{frame}{Roteiro da atividade guiada}
+\begin{block}{Objetivo}
+Configurar o ambiente e criar o primeiro servidor Node.js com rotas diferenciadas por URL.
+\end{block}
+\begin{enumerate}
+  \item \textbf{Instalar} Node.js LTS e configurar VS Code (20 min).
+  \item \textbf{Inicializar} projeto com \code{npm init -y} e instalar \code{nodemon} (10 min).
+  \item \textbf{Criar} \code{server.js} com servidor HTTP nativo respondendo em 3 rotas (30 min).
+  \item \textbf{Refatorar} uso de callbacks para async/await na leitura de arquivo (30 min).
+  \item \textbf{Organizar} projeto na estrutura de pastas recomendada (20 min).
+  \item \textbf{Publicar} no GitHub com \code{.gitignore} correto (10 min).
+\end{enumerate}
+\end{frame}
+
+\begin{frame}[fragile]{Desafio: servidor com m\'ultiplas rotas}
+\begin{block}{\code{server.js} -- extender com rotas}
+\begin{lstlisting}[language=JavaScript]
+const http = require('http');
+
+const server = http.createServer((req, res) => {
+  res.setHeader('Content-Type',
+    'application/json; charset=utf-8');
+
+  if (req.url === '/' && req.method === 'GET') {
+    res.writeHead(200);
+    res.end(JSON.stringify({ mensagem: 'API online' }));
+  } else if (req.url === '/usuarios' && req.method === 'GET') {
+    res.writeHead(200);
+    res.end(JSON.stringify([
+      { id: 1, nome: 'Ana' },
+      { id: 2, nome: 'Bruno' }
+    ]));
+  } else {
+    res.writeHead(404);
+    res.end(JSON.stringify({ erro: 'Rota nao encontrada' }));
+  }
+});
+
+server.listen(3000, () =>
+  console.log('http://localhost:3000'));
+\end{lstlisting}
+\end{block}
+\end{frame}
+
+\begin{frame}{Checkpoint de avalia\c{c}\~ao formativa}
+\begin{enumerate}
+  \item O servidor responde corretamente nas 3 rotas definidas?
+  \item O projeto est\'a organizado na estrutura de pastas recomendada?
+  \item O \code{.gitignore} exclui \code{node\_modules} e \code{.env}?
+  \item O \code{nodemon} reinicia automaticamente ao editar o arquivo?
+  \item O c\'odigo usa \code{async/await} na leitura de arquivo?
+  \item O reposit\'orio est\'a publicado no GitHub com commits descritivos?
+\end{enumerate}
+\end{frame}
+
+\begin{frame}{Entregável da Aula 1}
+\begin{block}{Reposit\'orio GitHub com}
+\begin{itemize}
+  \item \code{package.json} configurado com scripts \code{start} e \code{dev}.
+  \item \code{server.js} com servidor HTTP respondendo em pelo menos 3 rotas.
+  \item Estrutura de pastas \code{src/routes}, \code{src/controllers}.
+  \item \code{.gitignore} correto (sem \code{node\_modules}).
+  \item \code{README.md} descrevendo como rodar o projeto.
+\end{itemize}
+\end{block}
+\begin{alertblock}{Condi\c{c}\~ao para avan\c{c}ar para a Aula 2}
+Ambiente funcionando e servidor nativo operacional. A Aula 2 introduz o Express e pressup\~oe este ambiente pronto.
+\end{alertblock}
+\end{frame}
+
+\begin{frame}{Fechamento da Aula 1}
+\begin{block}{S\'intese}
+Hoje voc\^e entendeu o papel do backend, instalou o Node.js, compreendeu o Event Loop e criou o primeiro servidor HTTP com rotas diferenciadas.
+\end{block}
+\begin{itemize}
+  \item \textbf{Pr\'oxima aula}: Express -- estrutura, rotas e servidor b\'asico.
+  \item \textbf{Tarefa}: publicar o reposit\'orio com o entregável descrito acima.
+\end{itemize}
+\end{frame}
+
+% ============================================================
+\section{Refer\^encias}
+% ============================================================
+
+\begin{frame}[allowframebreaks]{Fontes utilizadas (verificadas)}
+\footnotesize
+\begin{itemize}
+  \item Node.js -- Documenta\c{c}\~ao oficial\\
+  \url{https://nodejs.org/en/docs}
+
+  \item npm -- Guia de refer\^encia\\
+  \url{https://docs.npmjs.com}
+
+  \item MDN Web Docs -- HTTP overview\\
+  \url{https://developer.mozilla.org/pt-BR/docs/Web/HTTP/Overview}
+
+  \item MDN Web Docs -- Introdu\c{c}\~ao a JavaScript ass\'incrono\\
+  \url{https://developer.mozilla.org/pt-BR/docs/Learn/JavaScript/Asynchronous/Introducing}
+
+  \item NVM (Node Version Manager)\\
+  \url{https://github.com/nvm-sh/nvm}
+
+  \item NVM for Windows\\
+  \url{https://github.com/coreybutler/nvm-windows}
+
+  \item OpenJS Foundation -- Node.js release schedule\\
+  \url{https://github.com/nodejs/release#release-schedule}
+
+  \item CGI.br -- Cartilha de Seguran\c{c}a para Internet\\
+  \url{https://www.cgi.br/publicacao/cartilha-de-seguranca-para-internet/}
+\end{itemize}
+\end{frame}
+
+\end{document}
